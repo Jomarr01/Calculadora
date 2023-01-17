@@ -1,8 +1,12 @@
 const Calculator = {
   keys: document.querySelectorAll('.tecla'),
   screen: document.getElementById('display'),
-  displayValue: 0,
-  mathOperation: 0,
+  displayValue: '',
+  firstValue: '',
+  secondValue: '',
+  operator: '',
+  previousOperator: '',
+  // operand: false,
 
   init: function() {
     this.keystrokeEffect();
@@ -46,36 +50,46 @@ const Calculator = {
       this.displayValue = this.displayValue + keyValue;
     }
 
-    if (
-      keyValue == 'mas' ||
-      keyValue == 'menos' ||
-      keyValue == 'por' ||
-      keyValue == 'dividido' ||
-      keyValue == 'igual'
-    ) {
+    if (  keyValue == 'mas' || keyValue == 'menos' ||
+          keyValue == 'por' || keyValue == 'dividido' ) {
+
       switch (keyValue) {
         case 'mas':
-          operator = '+';
+          this.operator = '+';
           break;
         case 'menos':
-          operator = '-';
+          this.operator = '-';
           break;
         case 'por':
-          operator = '*';
+          this.operator = '*';
           break;
         case 'dividido':
-          operator = '/';
+          this.operator = '/';
           break;
         default:
           break;
       }
 
-      this.mathOperation = `${this.mathOperation} ${operator} ${this.displayValue}`;
-      this.displayValue = '';
-
-      if (keyValue == 'igual') {
-        this.calculateOperations();
+      if (this.firstValue == '') {
+        this.firstValue = this.displayValue;
+        this.previousOperator = this.operator;
+      } else {
+        this.secondValue = this.displayValue;
+        this.firstValue = eval(`${this.firstValue} ${this.previousOperator} ${this.secondValue}`);
+        this.previousOperator = this.operator;
+        this.secondValue = '';
       }
+
+      console.log('Acumulado en this.firstValue: ', this.firstValue);
+      this.displayValue = '';
+    }
+    
+    if (keyValue == 'igual') {
+      if (this.secondValue == '') {
+        this.secondValue = this.displayValue;
+      }
+      this.firstValue = eval(`${this.firstValue} ${this.previousOperator} ${this.secondValue}`);
+      this.displayValue = this.firstValue;
     }
     
     this.updateScreen();
@@ -101,20 +115,26 @@ const Calculator = {
       this.displayValue = keyValue + this.displayValue;
   },
 
-  calculateOperations: function () {
-    console.log("🚀 ~ file: app.js:108 ~ this.mathOperation", this.mathOperation.slice(3))
-    this.displayValue = eval(this.mathOperation.slice(3));
-  },
+  // calculateOperations: function () {
+  //   console.log("🚀 ~ file: app.js:108 ~ this.mathOperation", this.mathOperation)
+  //   this.displayValue = eval(this.mathOperation);
+  // },
 
   cleanScreen: function() {
     this.screen.innerHTML = 0;
     this.displayValue = 0;
-    this.mathOperation = 0;
+    this.firstValue = '';
+    this.secondValue = '';
+    this.operator = '';
+    // this.operand = false;
   },
 
   updateScreen: function() {
-    if (this.displayValue.toString().length <= 8 )
+    if (this.displayValue.toString().length <= 8 ) {
       this.screen.innerHTML = this.displayValue;
+    } else if (this.operand !== true && this.operand !== false) {
+      this.screen.innerHTML = Number(this.displayValue).toExponential(2);
+    }
   }
 }
 
