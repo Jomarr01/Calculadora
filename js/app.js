@@ -6,7 +6,6 @@ const Calculator = {
   secondValue: '',
   operator: '',
   previousOperator: '',
-  // operand: false,
 
   init: function() {
     this.keystrokeEffect();
@@ -50,46 +49,12 @@ const Calculator = {
       this.displayValue = this.displayValue + keyValue;
     }
 
-    if (  keyValue == 'mas' || keyValue == 'menos' ||
-          keyValue == 'por' || keyValue == 'dividido' ) {
-
-      switch (keyValue) {
-        case 'mas':
-          this.operator = '+';
-          break;
-        case 'menos':
-          this.operator = '-';
-          break;
-        case 'por':
-          this.operator = '*';
-          break;
-        case 'dividido':
-          this.operator = '/';
-          break;
-        default:
-          break;
-      }
-
-      if (this.firstValue == '') {
-        this.firstValue = this.displayValue;
-        this.previousOperator = this.operator;
-      } else {
-        this.secondValue = this.displayValue;
-        this.firstValue = eval(`${this.firstValue} ${this.previousOperator} ${this.secondValue}`);
-        this.previousOperator = this.operator;
-        this.secondValue = '';
-      }
-
-      console.log('Acumulado en this.firstValue: ', this.firstValue);
-      this.displayValue = '';
+    if (  keyValue == 'mas' || keyValue == 'menos' || keyValue == 'por' || keyValue == 'dividido' ) {
+      this.manageTheOperators(keyValue);
     }
     
     if (keyValue == 'igual') {
-      if (this.secondValue == '') {
-        this.secondValue = this.displayValue;
-      }
-      this.firstValue = eval(`${this.firstValue} ${this.previousOperator} ${this.secondValue}`);
-      this.displayValue = this.firstValue;
+      this.resultButton();
     }
     
     this.updateScreen();
@@ -115,10 +80,48 @@ const Calculator = {
       this.displayValue = keyValue + this.displayValue;
   },
 
-  // calculateOperations: function () {
-  //   console.log("🚀 ~ file: app.js:108 ~ this.mathOperation", this.mathOperation)
-  //   this.displayValue = eval(this.mathOperation);
-  // },
+  manageTheOperators: function (keyValue) {
+    switch (keyValue) {
+      case 'mas':
+        this.operator = '+';
+        break;
+      case 'menos':
+        this.operator = '-';
+        break;
+      case 'por':
+        this.operator = '*';
+        break;
+      case 'dividido':
+        this.operator = '/';
+        break;
+      default:
+        break;
+    }
+
+    if (this.firstValue == '') {
+      this.firstValue = this.displayValue;
+      this.previousOperator = this.operator;
+    } else {
+      this.secondValue = this.displayValue;
+      this.calculateOperations();
+      this.previousOperator = this.operator;
+      this.secondValue = '';
+    }
+
+    this.displayValue = '';
+  },
+
+  calculateOperations: function() {
+    this.firstValue = eval(`${this.firstValue} ${this.previousOperator} ${this.secondValue}`);
+  },
+
+  resultButton: function() {
+    if (this.secondValue == '') {
+      this.secondValue = this.displayValue;
+    }
+    this.calculateOperations();
+    this.displayValue = this.firstValue;
+  },
 
   cleanScreen: function() {
     this.screen.innerHTML = 0;
@@ -126,7 +129,6 @@ const Calculator = {
     this.firstValue = '';
     this.secondValue = '';
     this.operator = '';
-    // this.operand = false;
   },
 
   updateScreen: function() {
